@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.anvilpowered.falcon.util.Config
 import org.anvilpowered.falcon.util.Paste
 import org.slf4j.Logger
+import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.file.Files
@@ -52,7 +53,20 @@ class MessageListener constructor(
       if (extension.contains("gz")) {
         attachment.downloadToFile().thenApplyAsync {
           try {
-            contents = CharStreams.toString(InputStreamReader(GZIPInputStream(FileInputStream(it))))
+            val inputStreamReader = InputStreamReader(GZIPInputStream(FileInputStream(it)))
+            val reader = BufferedReader(inputStreamReader)
+            var count = 0
+            while (reader.readLine() != null) {
+              count++
+            }
+            reader.close()
+            logger.info(count.toString())
+            if (count >= 100000) {
+              event.message.reply("Please send a smaller file! Line length maximum is 100,000!").submit()
+              return@thenApplyAsync
+            } else {
+              contents = CharStreams.toString(inputStreamReader)
+            }
           } catch (e: Exception) {
             logger.error("An error occurred decompressing a file!", e)
           }
@@ -71,7 +85,18 @@ class MessageListener constructor(
         || extension.equals("debug", true)
       ) {
         attachment.retrieveInputStream().thenAcceptAsync {
-          contents = CharStreams.toString(InputStreamReader(it))
+          var count = 0
+          val inputStreamReader = InputStreamReader(it)
+          val bufferedReader = BufferedReader(inputStreamReader)
+          while (bufferedReader.readLine() != null) {
+            count++
+          }
+          bufferedReader.close()
+          if (count >= 100000) {
+            event.message.reply("Please send a smaller file! Line length maximum is 100,000!").submit()
+            return@thenAcceptAsync
+          }
+          contents = CharStreams.toString(inputStreamReader)
           paste.post(contents, "http://dump.anvilpowered.org/dump", attachment.fileName, event.author.name, event.message)
           return@thenAcceptAsync
         }

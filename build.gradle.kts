@@ -35,7 +35,7 @@ dependencies {
 }
 
 application {
-  mainClassName = "org.anvilpowered.falcon.Falcon"
+  mainClassName = "org.anvilpowered.falcon.FalconKt"
 }
 
 tasks.shadowJar {
