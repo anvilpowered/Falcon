@@ -32,6 +32,7 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.zip.GZIPInputStream
 
 class MessageListener constructor(
@@ -54,6 +55,7 @@ class MessageListener constructor(
         attachment.downloadToFile().thenApplyAsync {
           try {
             val inputStreamReader = InputStreamReader(GZIPInputStream(FileInputStream(it)))
+            contents = CharStreams.toString(inputStreamReader)
             val reader = BufferedReader(inputStreamReader)
             var count = 0
             while (reader.readLine() != null) {
@@ -64,8 +66,6 @@ class MessageListener constructor(
             if (count >= 100000) {
               event.message.reply("Please send a smaller file! Line length maximum is 100,000!").submit()
               return@thenApplyAsync
-            } else {
-              contents = CharStreams.toString(inputStreamReader)
             }
           } catch (e: Exception) {
             logger.error("An error occurred decompressing a file!", e)
@@ -84,31 +84,45 @@ class MessageListener constructor(
         || extension.equals("yaml", true)
         || extension.equals("debug", true)
       ) {
-        attachment.retrieveInputStream().thenAcceptAsync {
+        var path: Path = Paths.get("temp.txt")
+        attachment.downloadToFile().thenApplyAsync {
           var count = 0
-          val inputStreamReader = InputStreamReader(it)
-          val bufferedReader = BufferedReader(inputStreamReader)
+          contents = it.bufferedReader().readText()
+          it.bufferedReader().close()
+          val bufferedReader = BufferedReader(InputStreamReader(FileInputStream(it)))
           while (bufferedReader.readLine() != null) {
             count++
           }
           bufferedReader.close()
+          path = it.toPath()
           if (count >= 100000) {
             event.message.reply("Please send a smaller file! Line length maximum is 100,000!").submit()
-            return@thenAcceptAsync
+            return@thenApplyAsync
           }
-          contents = CharStreams.toString(inputStreamReader)
           paste.post(contents, "http://dump.anvilpowered.org/dump", attachment.fileName, event.author.name, event.message)
-          return@thenAcceptAsync
+          return@thenApplyAsync
+        }.whenCompleteAsync { _, e ->
+          if (e != null) {
+            logger.error("An error occurred while processing a file", e)
+          }
+          deleteFile(path)
         }
       }
-      event.channel.sendMessage("An error occurred while uploading your file to AnvilPowered servers.")
     }
   }
 
   private fun deleteFile(path: Path) {
     GlobalScope.async {
       delay(10000)
-      Files.delete(path)
+      try {
+        if (Files.deleteIfExists(path)) {
+          logger.info("File deleted: ${path.fileName}")
+        } else {
+          logger.info("Could not delete file ${path.fileName}")
+        }
+      } catch (e: Exception) {
+        logger.error("An error occurred while deleting a file", e)
+      }
     }
   }
 }
