@@ -45,10 +45,6 @@ class MessageListener constructor(
     if (event.message.attachments.size != 0) {
       return
     }
-    if (event.message.invites.size != 0 && config.blockInvites) {
-      event.message.delete().submit()
-      return
-    }
     for (attachment in event.message.attachments) {
       val extension = attachment.fileExtension ?: continue
       var contents = ""

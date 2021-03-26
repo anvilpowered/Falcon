@@ -26,7 +26,4 @@ class Config {
 
   @Comment("\nDiscord bot token here")
   var botToken: String? = "<token>"
-
-  @Comment("\nIf this field is true, the bot will block all invites posted by players \nNote: this currently blocks for EVERYONE")
-  var blockInvites: Boolean = false
 }
