@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.anvilpowered.falcon.listener
+package org.anvilpowered.falcon.discord
 
 import com.google.common.io.CharStreams
 import kotlinx.coroutines.GlobalScope

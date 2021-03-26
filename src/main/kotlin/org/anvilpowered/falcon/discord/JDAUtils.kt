@@ -24,7 +24,6 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.internal.entities.EntityBuilder
-import org.anvilpowered.falcon.listener.MessageListener
 import org.anvilpowered.falcon.util.Config
 import org.anvilpowered.falcon.util.Paste
 import org.slf4j.Logger
