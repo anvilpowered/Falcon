@@ -13,8 +13,7 @@ version = "0.1.0-SNAPSHOT"
 
 repositories {
   mavenCentral()
-  jcenter()
-  maven("https://kotlin.bintray.com/kotlinx")
+  maven("https://m2.dv8tion.net/releases")
   maven("https://repo.spongepowered.org/repository/maven-public/")
 }
 

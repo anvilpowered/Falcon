@@ -26,4 +26,7 @@ class Config {
 
   @Comment("\nDiscord bot token here")
   var botToken: String? = "<token>"
+
+  @Comment("\nCurrently playing status")
+  var status: String? = "Scanning files"
 }

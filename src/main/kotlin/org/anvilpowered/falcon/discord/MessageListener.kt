@@ -36,7 +36,6 @@ import java.nio.file.Paths
 import java.util.zip.GZIPInputStream
 
 class MessageListener constructor(
-  private val config: Config,
   private val logger: Logger,
   private val paste: Paste,
 ) : ListenerAdapter() {

@@ -39,10 +39,10 @@ class JDAUtils @Inject constructor(
 
   fun setup() {
     bot = JDABuilder.createDefault(config.botToken)
-      .addEventListeners(MessageListener(config, logger, paste))
+      .addEventListeners(MessageListener(logger, paste))
       .build()
     bot.isAutoReconnect = true
-    bot.presence.activity = EntityBuilder.createActivity("Rule Breakers", null, Activity.ActivityType.WATCHING)
+    bot.presence.activity = EntityBuilder.createActivity(config.status, null, Activity.ActivityType.WATCHING)
   }
 
   fun teardown() = bot.shutdownNow()
